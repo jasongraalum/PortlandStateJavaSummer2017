@@ -3,7 +3,6 @@ package edu.pdx.cs410J.whitlock.client;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.junit.client.GWTTestCase;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
@@ -21,16 +20,17 @@ public class AirlineGwtIT extends GWTTestCase {
   }
 
   @Test
-  public void testClickingShowAirlineButtonAlertsWithAirlineInformation() {
-    final CapturingAlerter alerter = new CapturingAlerter();
+  public void testClickingShowAirlineButtonDisplaysPrettyAirline() {
+    final String airlineName = "My Airline";
 
-    final AirlineGwt ui = new AirlineGwt(alerter);
+    final AirlineGwt ui = new AirlineGwt();
     ui.onModuleLoad();
 
     // Wait for UI widgets to be created
     waitBeforeRunning(500, new Runnable() {
       @Override
       public void run() {
+        ui.airlineName.setText(airlineName);
         click(ui.showAirlineButton);
       }
     });
@@ -39,102 +39,13 @@ public class AirlineGwtIT extends GWTTestCase {
     waitBeforeRunning(500, new Runnable() {
       @Override
       public void run() {
-        String message = alerter.getMessage();
-        assertNotNull(message);
-        assertTrue(message, message.contains("Air CS410J with 1 flights"));
+        String pretty = ui.airlinePrettyText.getText();
+        assertNotNull(pretty);
+        assertTrue(pretty, pretty.contains(airlineName));
         finishTest();
       }
     });
 
-    delayTestFinish(1000);
-  }
-
-  @Test
-  public void testClickingShowUndeclaredExceptionButtonAlertsWithExpectedMessage() {
-    final CapturingAlerter alerter = new CapturingAlerter();
-
-    final AirlineGwt ui = new AirlineGwt(alerter);
-    ui.onModuleLoad();
-
-    // Wait for UI widgets to be created
-    waitBeforeRunning(500, new Runnable() {
-      @Override
-      public void run() {
-        click(ui.showUndeclaredExceptionButton);
-      }
-    });
-
-    // Wait for the RPC call to return
-    waitBeforeRunning(500, new Runnable() {
-      @Override
-      public void run() {
-        String message = alerter.getMessage();
-        assertNotNull(message);
-        assertTrue(message, message.contains("StatusCodeException: 500 Server Error"));
-        finishTest();
-      }
-    });
-
-    // Wait up to 1000 milliseconds for the validation to complete
-    delayTestFinish(1000);
-  }
-
-  @Test
-  public void testClickingShowDeclaredExceptionButtonAlertsWithExpectedMessage() {
-    final CapturingAlerter alerter = new CapturingAlerter();
-
-    final AirlineGwt ui = new AirlineGwt(alerter);
-    ui.onModuleLoad();
-
-    // Wait for UI widgets to be created
-    waitBeforeRunning(500, new Runnable() {
-      @Override
-      public void run() {
-        click(ui.showDeclaredExceptionButton);
-      }
-    });
-
-    // Wait for the RPC call to return
-    waitBeforeRunning(500, new Runnable() {
-      @Override
-      public void run() {
-        String message = alerter.getMessage();
-        assertNotNull(message);
-        assertTrue(message, message.contains("IllegalStateException: Expected declared exception"));
-        finishTest();
-      }
-    });
-
-    // Wait up to 1000 milliseconds for the validation to complete
-    delayTestFinish(1000);
-  }
-
-  @Test
-  public void testClickingShowClientSideExceptionButtonAlertsWithExpectedMessage() {
-    final CapturingAlerter alerter = new CapturingAlerter();
-
-    final AirlineGwt ui = new AirlineGwt(alerter);
-    ui.onModuleLoad();
-
-    // Wait for UI widgets to be created
-    waitBeforeRunning(500, new Runnable() {
-      @Override
-      public void run() {
-        try {
-          click(ui.showClientSideExceptionButton);
-          fail("Should have thrown an UmbrellaException");
-
-        } catch (UmbrellaException ex) {
-          Throwable cause = ex.getCause();
-          assertTrue(cause instanceof IllegalStateException);
-          IllegalStateException ise = (IllegalStateException) cause;
-          assertTrue(ise.getMessage().contains("Expected exception on the client side"));
-          finishTest();
-        }
-      }
-    });
-
-    // Wait up to 1000 milliseconds for the validation to complete
     delayTestFinish(1000);
   }
 
